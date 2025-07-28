@@ -16,6 +16,7 @@ export default function App() {
   const [currentView, setCurrentView] = useState<View>("home");
   const [selectedSheetId, setSelectedSheetId] = useState<Id<"chordSheets"> | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
+  const [showSignIn, setShowSignIn] = useState(false);
 
   const loggedInUser = useQuery(api.auth.loggedInUser);
 
@@ -30,6 +31,10 @@ export default function App() {
   };
 
   const handleCreateNew = () => {
+    if (!loggedInUser) {
+      setShowSignIn(true);
+      return;
+    }
     setSelectedSheetId(null);
     setCurrentView("create");
   };
@@ -96,20 +101,6 @@ export default function App() {
       </header>
 
       <main className="flex-1">
-        <Unauthenticated>
-          <div className="max-w-md mx-auto mt-20 p-6">
-            <div className="text-center mb-8">
-              <h1 className="text-4xl font-bold text-gray-900 mb-4">
-                Welcome to ChordBook
-              </h1>
-              <p className="text-xl text-gray-600">
-                Share and discover song chords and lyrics
-              </p>
-            </div>
-            <SignInForm />
-          </div>
-        </Unauthenticated>
-
         <Authenticated>
           <div className="max-w-6xl mx-auto p-6">
             {currentView === "home" && (
@@ -149,6 +140,20 @@ export default function App() {
           </div>
         </Authenticated>
       </main>
+      {showSignIn && (
+        <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-8 shadow-lg max-w-md w-full">
+            <h2 className="text-2xl font-bold mb-4">Sign in to create a new song</h2>
+            <SignInForm />
+            <button
+              className="mt-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+              onClick={() => setShowSignIn(false)}
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
       <Toaster />
     </div>
   );
