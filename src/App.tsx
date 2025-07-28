@@ -101,44 +101,42 @@ export default function App() {
       </header>
 
       <main className="flex-1">
-        <Authenticated>
-          <div className="max-w-6xl mx-auto p-6">
-            {currentView === "home" && (
-              <ChordSheetList
-                onViewSheet={handleViewSheet}
-                onEditSheet={handleEditSheet}
-                searchQuery={searchQuery}
-              />
-            )}
-            {currentView === "my-sheets" && (
-              <ChordSheetList
-                onViewSheet={handleViewSheet}
-                onEditSheet={handleEditSheet}
-                showMySheets={true}
-              />
-            )}
-            {currentView === "create" && (
-              <ChordSheetEditor
-                onSave={handleBackToHome}
-                onCancel={handleBackToHome}
-              />
-            )}
-            {currentView === "edit" && selectedSheetId && (
-              <ChordSheetEditor
-                sheetId={selectedSheetId}
-                onSave={handleBackToHome}
-                onCancel={handleBackToHome}
-              />
-            )}
-            {currentView === "view" && selectedSheetId && (
-              <ChordSheetViewer
-                sheetId={selectedSheetId}
-                onEdit={() => handleEditSheet(selectedSheetId)}
-                onBack={handleBackToHome}
-              />
-            )}
-          </div>
-        </Authenticated>
+        <div className="max-w-6xl mx-auto p-6">
+          {currentView === "home" && (
+            <ChordSheetList
+              onViewSheet={handleViewSheet}
+              onEditSheet={handleEditSheet}
+              searchQuery={searchQuery}
+            />
+          )}
+          {currentView === "my-sheets" && loggedInUser && (
+            <ChordSheetList
+              onViewSheet={handleViewSheet}
+              onEditSheet={handleEditSheet}
+              showMySheets={true}
+            />
+          )}
+          {currentView === "create" && loggedInUser && (
+            <ChordSheetEditor
+              onSave={handleBackToHome}
+              onCancel={handleBackToHome}
+            />
+          )}
+          {currentView === "edit" && selectedSheetId && loggedInUser && (
+            <ChordSheetEditor
+              sheetId={selectedSheetId}
+              onSave={handleBackToHome}
+              onCancel={handleBackToHome}
+            />
+          )}
+          {currentView === "view" && selectedSheetId && (
+            <ChordSheetViewer
+              sheetId={selectedSheetId}
+              onEdit={() => handleEditSheet(selectedSheetId)}
+              onBack={handleBackToHome}
+            />
+          )}
+        </div>
       </main>
       {showSignIn && (
         <div className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50">
