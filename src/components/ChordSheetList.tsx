@@ -29,7 +29,7 @@ export function ChordSheetList({
   
   const mySheets = useQuery(
     api.chordSheets.myChordSheets,
-    showMySheets ? {} : "skip"
+    showMySheets && loggedInUser ? {} : "skip"
   );
 
   const chordSheets = showMySheets 
@@ -82,73 +82,77 @@ export function ChordSheetList({
       </div>
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-        {chordSheets.map((sheet) => (
-          <div
-            key={sheet._id}
-            className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
-          >
-            <div className="flex justify-between items-start mb-3">
-              <div className="flex-1 min-w-0">
-                <h3 className="text-lg font-semibold text-gray-900 truncate">
-                  {sheet.title}
-                </h3>
-                <p className="text-sm text-gray-600 truncate">
-                  by {sheet.artist}
-                </p>
-              </div>
-              {showMySheets && (
-                <div className="flex items-center gap-1 ml-2">
-                  <span className={`inline-block w-2 h-2 rounded-full ${
-                    sheet.isPublic ? 'bg-green-500' : 'bg-gray-400'
-                  }`}></span>
-                  <span className="text-xs text-gray-500">
-                    {sheet.isPublic ? 'Public' : 'Private'}
-                  </span>
+        {chordSheets.map((sheet) => {
+          const isOwner = loggedInUser && sheet.authorId === loggedInUser._id;
+          
+          return (
+            <div
+              key={sheet._id}
+              className="bg-white rounded-lg shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow"
+            >
+              <div className="flex justify-between items-start mb-3">
+                <div className="flex-1 min-w-0">
+                  <h3 className="text-lg font-semibold text-gray-900 truncate">
+                    {sheet.title}
+                  </h3>
+                  <p className="text-sm text-gray-600 truncate">
+                    by {sheet.artist}
+                  </p>
                 </div>
-              )}
-            </div>
-
-            <div className="text-sm text-gray-500 mb-4">
-              <p>by {showMySheets ? 'You' : (sheet as any).authorName || 'Unknown'}</p>
-              <p>{new Date(sheet._creationTime).toLocaleDateString()}</p>
-            </div>
-
-            {sheet.tags && sheet.tags.length > 0 && (
-              <div className="flex flex-wrap gap-1 mb-4">
-                {sheet.tags.slice(0, 3).map((tag, index) => (
-                  <span
-                    key={index}
-                    className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
-                  >
-                    {tag}
-                  </span>
-                ))}
-                {sheet.tags.length > 3 && (
-                  <span className="text-xs text-gray-500">
-                    +{sheet.tags.length - 3} more
-                  </span>
+                {showMySheets && (
+                  <div className="flex items-center gap-1 ml-2">
+                    <span className={`inline-block w-2 h-2 rounded-full ${
+                      sheet.isPublic ? 'bg-green-500' : 'bg-gray-400'
+                    }`}></span>
+                    <span className="text-xs text-gray-500">
+                      {sheet.isPublic ? 'Public' : 'Private'}
+                    </span>
+                  </div>
                 )}
               </div>
-            )}
 
-            <div className="flex gap-2">
-              <button
-                onClick={() => onViewSheet(sheet._id)}
-                className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
-              >
-                View
-              </button>
-              {showMySheets && (
-                <button
-                  onClick={() => onEditSheet(sheet._id)}
-                  className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200 transition-colors"
-                >
-                  Edit
-                </button>
+              <div className="text-sm text-gray-500 mb-4">
+                <p>by {showMySheets ? 'You' : (sheet as any).authorName || 'Unknown'}</p>
+                <p>{new Date(sheet._creationTime).toLocaleDateString()}</p>
+              </div>
+
+              {sheet.tags && sheet.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 mb-4">
+                  {sheet.tags.slice(0, 3).map((tag, index) => (
+                    <span
+                      key={index}
+                      className="inline-block px-2 py-1 text-xs bg-blue-100 text-blue-700 rounded-full"
+                    >
+                      {tag}
+                    </span>
+                  ))}
+                  {sheet.tags.length > 3 && (
+                    <span className="text-xs text-gray-500">
+                      +{sheet.tags.length - 3} more
+                    </span>
+                  )}
+                </div>
               )}
+
+              <div className="flex gap-2">
+                <button
+                  onClick={() => onViewSheet(sheet._id)}
+                  className="flex-1 px-3 py-2 bg-blue-600 text-white text-sm rounded-md hover:bg-blue-700 transition-colors"
+                >
+                  View
+                </button>
+                {(showMySheets || isOwner) && (
+                  <button
+                    onClick={() => onEditSheet(sheet._id)}
+                    className="px-3 py-2 bg-gray-100 text-gray-700 text-sm rounded-md hover:bg-gray-200 transition-colors"
+                  >
+                    Edit
+                  </button>
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
